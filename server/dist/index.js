@@ -12,8 +12,20 @@ app.get("/", (req, res) => {
     res.send("<h1>Welcome to socket.io</h1>");
 });
 io.on("connection", (socket) => {
-    console.log(socket);
+    socket.on("connected", () => {
+        console.log("User connected");
+    });
+    socket.on("join-chat", (chatname) => {
+        socket.join(chatname);
+        console.log(`User joined chat: ${chatname}`);
+    });
+    socket.on("create-chat", (chatname) => {
+        io.emit("received-chat", chatname);
+    });
+    socket.on("send-message", ({ chatname, message }) => {
+        io.to(chatname).emit("message", message);
+    });
 });
-server.listen(3000, () => {
-    console.log("Server is running on localhost:3000");
+server.listen(8000, () => {
+    console.log("Server is running on localhost:8000");
 });
